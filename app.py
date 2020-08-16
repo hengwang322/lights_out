@@ -13,11 +13,6 @@ MAPBOX_TOKEN = os.environ['MAPBOX_TOKEN']
 def update_style():
     BACKGROUND_COLOR = "rgb(50,50,50)"
     COLOR = "#fff"
-    padding_top = 5
-    padding_right = 10
-    padding_left = 10
-    padding_bottom = 10
-    max_width_str = f"max-width: 100%;"
 
     st.markdown(
         f"""
@@ -77,10 +72,12 @@ def main():
         <li>Is it worth metering individual poles to reduce electricity costs from 
         dimming with and without sensors?</li>
         <li>Are solar poles worth the cost?</li>
+        <li>Can we make use of IoT and wireless technologies to make our community more 
+        sustainable?</li>
         <p style="text-align:justify">To investigate this, we looked into street 
-        light data set from the City of Hobart, as well as data on historical energy 
-        usage and foot traffic in the CBD.</p>
-
+        light data set from the City of Hobart, data on historical energy 
+        usage and foot traffic in the CBD, as well as potentially intergrate street 
+        into a Smart City.</p>
         """, unsafe_allow_html=True)
 
     LIGHT_FILE = 'light.csv'
@@ -210,14 +207,7 @@ def main():
     street light budget, making this a realistic plan. Using this information, 
     we created a visualization that shows the streets involved during each 
     phase and the annual savings from reduced energy and network costs.</p> 
-    <p style="text-align:justify">In the drop down box you can select the 
-    phases to see the spread of solar poles in the city, as well as the 
-    annual savings per pole.</p>
     """, unsafe_allow_html=True)
-
-    traffic = Image.open(os.path.join('asset', 'traffic.png'))
-    st.image(traffic,
-             use_column_width=True)
 
     year_dict = {'Year 1': [1],
                  'Year 2': [2],
@@ -225,7 +215,11 @@ def main():
                  'Year 4': [4],
                  'All Years': [1, 2, 3, 4],
                  }
-    st.markdown('Choose a year:')
+    st.markdown("""
+    <p style="text-align:justify">In the drop down box you can select the 
+    phases to see the spread of solar poles in the city, as well as the 
+    annual savings per pole.</p>
+    """, unsafe_allow_html=True)
     year_select = st.selectbox('', list(year_dict.keys()))
     solar_df = pd.read_csv('./solar_pole_table.csv')
     st.plotly_chart(plot_solar(solar_df, year_select),
@@ -248,9 +242,9 @@ def main():
     
 
     This web app is part of a submission for GovHack 2020 Hackathon, made by 
-    <a href="https://www.linkedin.com/in/arnab-mukherjee-data/">Arnab Mukherjee</a> , 
+    <a href="https://www.linkedin.com/in/arnab-mukherjee-data/">Arnab Mukherjee</a>, 
     <a href="https://www.linkedin.com/in/emily-shen/">Emily Shen</a>, 
-    <a href="https://www.linkedin.com/in/hengwang322/">Heng Wang</a>, 
+    <a href="https://www.linkedin.com/in/hengwang322/">Heng Wang</a>, and 
     <a href="https://www.linkedin.com/in/alfred-zou/">Alfred Zou</a>.
     <br>
     Feel free to check out our <a href="https://hackerspace.govhack.org/projects/lights_out">project page</a> 
@@ -258,6 +252,7 @@ def main():
     
     </p>""",
                 unsafe_allow_html=True)
+
 
 if __name__ == '__main__':
     main()
