@@ -4,15 +4,58 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-from src.plot import plot_cost, plot_lighting_map, plot_lamp_hist
+from src.plot import plot_cost, plot_lighting_map, plot_lamp_hist, plot_solar
 
 MAPBOX_TOKEN = os.environ['MAPBOX_TOKEN']
 
 
+def update_style():
+    BACKGROUND_COLOR = "rgb(50,50,50)"
+    COLOR = "#fff"
+    padding_top = 5
+    padding_right = 10
+    padding_left = 10
+    padding_bottom = 10
+    max_width_str = f"max-width: 100%;"
+    
+    st.markdown(
+        f"""
+        <style>
+            .reportview-container .main .block-container{{
+                {max_width_str}
+                padding-top: {padding_top}rem;
+                padding-right: {padding_right}rem;
+                padding-left: {padding_left}rem;
+                padding-bottom: {padding_bottom}rem;
+            }}
+            .reportview-container .main {{
+                color: {COLOR};
+                background-color: {BACKGROUND_COLOR};
+            }}
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    st.sidebar.markdown(
+        f"""
+        <style>
+            .reportview-container .main {{
+                color: {COLOR};
+                background-color: {BACKGROUND_COLOR};
+            }}
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
 def main():
     st.beta_set_page_config(page_title='Lights Out!',
-                            page_icon="💡",
-                            layout='wide')
+                            page_icon="💡")
+    update_style()
+
+    st.sidebar.header('About Us')
+    st.sidebar.markdown('We are Lights Out!')
     st.markdown("""<h1 style="text-align:center">Lights Out!</h1>""",
                 unsafe_allow_html=True)
 
@@ -70,8 +113,8 @@ def main():
     * Installing metering for each light pole cannot be justified.
     * Similarly for the idea of installing sensors.
     * Reducing wattage is by far the most effective and recommended strategy""")
-
-    lamp_type = st.selectbox('Select a light type', [
+    st.markdown('Choose a lamp type below:')
+    lamp_type = st.selectbox('', [
                              'MV', 'CFL', 'LED', 'HPS'])
     lamp_type_desc_dict = {
         'MV': """
@@ -109,6 +152,18 @@ def main():
     st.write(lamp_type_desc_dict[lamp_type])
     st.plotly_chart(plot_lamp_hist(light, lamp_type), use_container_width=True)
 
+    st.header('Solar')
+    year_dict = {'Year 1':[1],
+    'Year 2':[2],
+    'Year 3':[3],
+    'Year 4':[4],
+    'All Years':[1,2,3,4],
+    }
+    st.markdown('Choose a year:')
+    year_select = st.selectbox('', list(year_dict.keys()))
+    solar_df = pd.read_csv('./solar_pole_table.csv')
+    st.plotly_chart(plot_solar(solar_df,year_select), use_container_width=True)
+    solar_df.drop(['Longitude','Latitude'],axis=1)[solar_df['Implementation year'].isin(year_dict[year_select])]
 
 if __name__ == '__main__':
     main()
