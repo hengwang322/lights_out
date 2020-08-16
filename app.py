@@ -72,7 +72,7 @@ def main():
         of Hobart, where only 300 are managed by the city. The rest of the lights are 
         managed by TasNetworks and are unmetered. This means regardless if the light 
         is on, off, or dimmed, the council pays the full 10 hours a day.</p>
-        <p style="text-align:justify">We wanted to investigate 3 main ideas:</p>
+        <p style="text-align:justify">We wanted to investigate 4 main ideas:</p>
         <li>Which bulbs are the most effective, and is it cost-effective to swap bulbs?</li>
         <li>Is it worth metering individual poles to reduce electricity costs from 
         dimming with and without sensors?</li>
@@ -91,12 +91,12 @@ def main():
     st.write("""
     <p style="text-align:justify">We wanted to evaluate each type of bulb for their 
     operational cost over 25,000 hours by standardising their wattage to 1700 lumens. 
-    Assuming an electrical cost of $0.4/kwh, we can see the LED and HPS bulbs are 
+    Assuming an electrical cost of $0.4/kWh, we can see the LED and HPS bulbs are 
     twice as efficient as MV and CFL bulbs. MV and CFL bulbs are the prime candida
     tes for replacement given their wattage to lumens inefficiency.</p>
     <p style="text-align:justify">Assuming the fixed cost of changing a bulb to a 
     different type is $700 and that we hope to recoup our expenses in 5 years, we 
-    would need a wattage difference of 96watts to justify swapping to a more 
+    would need a wattage difference of 96 W to justify swapping to a more 
     efficient LED bulb.</p>
     """, unsafe_allow_html=True)
     st.plotly_chart(plot_cost(), use_container_width=True)
@@ -108,9 +108,9 @@ def main():
     identify trends. We noticed that high wattage HPS and WV lights were used 
     on highways and major roads, with LED and CFL mainly used on minor roads 
     in residential areas.</p>
-    <p style="text-align:justify">We recommend swapping out 400W MV to 250W 
+    <p style="text-align:justify">We recommend swapping out 400 W MV to 250 W 
     LED bulbs on major roads.</p>
-    <p style="text-align:justify">We recommend swapping out 125W and 150W MV 
+    <p style="text-align:justify">We recommend swapping out 125 W and 150 W MV 
     to 18W LED bulbs on minor roads.</p>
     <p style="text-align:justify">Possible MV to LED swap outs have been 
     located in the map below.</p>
@@ -125,13 +125,13 @@ def main():
         'MV': """
         <p style="text-align:justify">MV bulbs are the least efficient 
         and we recommend swapping them when applicable.</p>
-        <p style="text-align:justify">We recommend swapping 400W MV to 
-        250W LED bulbs on major roads. This is assuming that 250W LED 
-        lights have the equivalent luminosity to 250W HPS lights. This 
+        <p style="text-align:justify">We recommend swapping 400 W MV to 
+        250 W LED bulbs on major roads. This is assuming that 250 W LED 
+        lights have the equivalent luminosity to 250 W HPS lights. This 
         has the potential saving of $219 in electrical costs per annum, 
         and there are 155 possible replacements.</p>
         <p style="text-align:justify">We recommend swapping out 125W and 
-        150W MV to 18W LED bulbs on minor roads.</p>
+        150 W MV to 18 W LED bulbs on minor roads.</p>
 
         """,
 
@@ -159,7 +159,7 @@ def main():
     st.markdown(lamp_type_desc_dict[lamp_type], unsafe_allow_html=True)
     st.plotly_chart(plot_lamp_hist(light, lamp_type), use_container_width=True)
 
-    st.markdown("""<h2 style="text-align:center">Idea 2: Metering, Dimming and Sensors</h2>""",
+    st.markdown("""<h2 style="text-align:center">Idea 2: Metering, dimming and sensors</h2>""",
                 unsafe_allow_html=True)
 
     st.markdown("""
@@ -169,7 +169,7 @@ def main():
     dimming in residential areas, as they are most likely the areas with 
     the most downtime at night. We have chosen not to consider dimming on 
     highways and major roads due to safety reasons.</p>
-    <p style="text-align:justify">Dimming already efficient 18W LED lights in 
+    <p style="text-align:justify">Dimming already efficient 18 W LED lights in 
     residential areas have minuscule gains of 3 hours saved per night. This is 
     an annual saving of $8 per meter installed per year. Given an expensive 
     upfront meter box installation cost, we cannot recommend dimming with or 
@@ -201,10 +201,19 @@ def main():
     <li>High upfront cost</li>
     <li>Solar energy is dependant on weather factors such as UV index, cloud 
     coverage and daylight hours</li>
-    
-        """, unsafe_allow_html=True)
 
-
+    <p style="text-align:justify">Our recommendation plan is a 4 phase solar 
+    pole rollout for the City of Hobart. We looked at major foot traffic 
+    areas to help determine which locations would provide the greatest 
+    social benefit to help attract people towards the city centre. We 
+    also made sure each phase was within the City of Hobart's annual 
+    street light budget, making this a realistic plan. Using this information, 
+    we created a visualization that shows the streets involved during each 
+    phase and the annual savings from reduced energy and network costs.</p> 
+    <p style="text-align:justify">In the drop down box you can select the 
+    phases to see the spread of solar poles in the city, as well as the 
+    annual savings per pole.</p>
+    """, unsafe_allow_html=True)
 
     traffic = Image.open(os.path.join('asset', 'traffic.png'))
     st.image(traffic,
@@ -233,6 +242,22 @@ def main():
     st.image(smart_city, caption='How poles can be intergrated into Smart City',
              use_column_width=True)
 
+    st.header('About')
+    st.markdown("""
+    <p style="text-align:justify">
+    
+
+    This web app is part of a submission for GovHack 2020 Hackathon, made by 
+    <a href="https://www.linkedin.com/in/arnab-mukherjee-data/">Arnab Mukherjee</a> , 
+    <a href="https://www.linkedin.com/in/emily-shen/">Emily Shen</a>, 
+    <a href="https://www.linkedin.com/in/hengwang322/">Heng Wang</a>, 
+    <a href="https://www.linkedin.com/in/alfred-zou/">Alfred Zou</a>.
+    <br>
+    Feel free to check out our <a href="https://hackerspace.govhack.org/projects/lights_out">project page</a> 
+    and <a href="https://github.com/hengwang322/lights_out">the repository</a>! 
+    
+    </p>""",
+                unsafe_allow_html=True)
 
 if __name__ == '__main__':
     main()
