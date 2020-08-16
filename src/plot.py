@@ -20,9 +20,12 @@ def plot_cost():
             'rgb(163, 129, 73)',
             'rgb(128, 114, 91)'])],
         layout_title_text="""Operational cost of different types of lights over 25,000 hours
-        <br>Standardised to 1700 Lumen"""
+        <br>Standardised to 1700 Lumen""",
+        
     )
     fig.update_layout(
+        template='plotly_dark',
+        paper_bgcolor="rgb(50,50,50)",
         xaxis_title="Type of light",
         yaxis_title="Operational Cost",
         title_font_size=20,
@@ -37,11 +40,11 @@ def plot_cost():
 def plot_lighting_map(light_og):
     light = light_og.copy()
     light['lamp_type'] = np.where((light['lamp_type'] == 'MV') & (
-        light['wattage'] == 400), 'POI (250W LED)', light['lamp_type'])
+        light['wattage'] == 400), 'To 250 W LED', light['lamp_type'])
     light['lamp_type'] = np.where((light['lamp_type'] == 'MV') & (
-        light['wattage'] == 125), 'POI (20W LED)', light['lamp_type'])
+        light['wattage'] == 125), 'To 20 W LED', light['lamp_type'])
     light['lamp_type'] = np.where((light['lamp_type'] == 'MV') & (
-        light['wattage'] == 150), 'POI (20W LED)', light['lamp_type'])
+        light['wattage'] == 150), 'To 20 W LED', light['lamp_type'])
 
     fig = px.scatter_mapbox(light,
                             lat='latitude',
@@ -50,9 +53,11 @@ def plot_lighting_map(light_og):
                             size='wattage',
                             size_max=10,
                             title='Lighting in Hobart',
-                            zoom=16)
+                            zoom=16,
+                            template='plotly_dark',
+                            )
 
-    poi_small = light[light['lamp_type'] == 'POI (250W LED)']
+    poi_small = light[light['lamp_type'] == 'To 250 W LED']
     fig.add_trace(go.Scattermapbox(
         lat=poi_small.latitude,
         lon=poi_small.longitude,
@@ -61,7 +66,7 @@ def plot_lighting_map(light_og):
         showlegend=False
     ))
 
-    poi_large = light[light['lamp_type'] == 'POI (20W LED)']
+    poi_large = light[light['lamp_type'] == 'To 20 W LED']
     fig.add_trace(go.Scattermapbox(
         lat=poi_large.latitude,
         lon=poi_large.longitude,
@@ -71,13 +76,14 @@ def plot_lighting_map(light_og):
     ))
 
     fig.update_layout(
+        paper_bgcolor="rgb(50,50,50)",
         title_font_size=20,
         height=600,
         mapbox=dict(
             accesstoken=MAPBOX_TOKEN,
             zoom=14,
             center=dict(lat=-42.88, lon=147.329),
-            style='light'
+            style='dark'
         ),
         margin=dict(l=0, r=0, t=80, b=20))
 
@@ -85,7 +91,6 @@ def plot_lighting_map(light_og):
 
 
 def plot_lamp_hist(light, lamp_type):
-
     lamp_dict = {'MV': 'Mercury-vapour lamp', 'CFL': 'Compact fluorescent lamp',
                  'LED': 'Light-emitting diode', 'HPS': 'High Pressure Sodium'}
     full_type = lamp_dict[lamp_type]
@@ -100,10 +105,42 @@ def plot_lamp_hist(light, lamp_type):
     )
 
     fig.update_layout(
+        template='plotly_dark',
+        paper_bgcolor="rgb(50,50,50)",
         xaxis_title="Wattage",
         yaxis_title="Number of Lamps",
         title_font_size=20,
         margin=dict(l=0, r=0, t=100, b=20))
     fig.update_xaxes(title_font_size=17)
     fig.update_yaxes(title_font_size=17)
+    return fig
+
+
+def plot_solar(solar_df,year_select):
+    year_dict = {'Year 1':[1],
+    'Year 2':[2],
+    'Year 3':[3],
+    'Year 4':[4],
+    'All Years':[1,2,3,4],
+    }
+        
+    fig = px.scatter_mapbox(solar_df[solar_df['Implementation year'].isin(year_dict[year_select])],
+                        lat='Latitude', 
+                        lon='Longitude', 
+                        color= 'Lamp type', 
+                        size = 'Annual savings',
+                        zoom=14)
+
+    fig.update_layout(
+        template='plotly_dark',
+        paper_bgcolor="rgb(50,50,50)",
+        title_font_size=20,
+        height=400,
+        mapbox=dict(
+            accesstoken=MAPBOX_TOKEN,
+            zoom=12.5,
+            center=dict(lat=-42.88, lon=147.329),
+            style='dark'
+        ),
+        margin=dict(l=0, r=0, t=80, b=20))
     return fig
