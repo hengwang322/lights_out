@@ -231,7 +231,21 @@ def main():
 
     st.markdown("""<h2 style="text-align:center">Idea 4: Embracing a smart future</h2>""",
                 unsafe_allow_html=True)
-
+    st.markdown("""
+    <p style="text-align:justify">We know cities are constantly on the lookout 
+    for smart solutions to enhance city vibrancy and promote local businesses 
+    by attracting local and overseas tourists. With this in mind, we propose 
+    building on the sustainable solar poles and adding in street friendly 
+    features such as a solar charging station for small devices.<br>
+    We also believe we can harness the power of IoT by connecting each 
+    solar pole to a cloud. Councils are able to utilise these wireless 
+    connections by feeding in inputs such as weather forecasts, UV 
+    index, cloud coverage. This allows the council to adjust the dimming 
+    to accommodate for special public events such as New Years, 
+    which may draw large crowds out into the city late at night. 
+    This flexibility provides the citizens with safe lighting, as 
+    well as meeting the council's energy and sustainability requirements.</p>
+    """, unsafe_allow_html=True)
     smart_city = Image.open(os.path.join('asset', 'smart_city.png'))
     st.image(smart_city, caption='How poles can be intergrated into Smart City',
              use_column_width=True)
@@ -239,8 +253,6 @@ def main():
     st.header('About')
     st.markdown("""
     <p style="text-align:justify">
-    
-
     This web app is part of a submission for GovHack 2020 Hackathon, made by 
     <a href="https://www.linkedin.com/in/arnab-mukherjee-data/">Arnab Mukherjee</a>, 
     <a href="https://www.linkedin.com/in/emily-shen/">Emily Shen</a>, 
