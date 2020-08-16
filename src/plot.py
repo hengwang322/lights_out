@@ -42,9 +42,9 @@ def plot_lighting_map(light_og):
     light['lamp_type'] = np.where((light['lamp_type'] == 'MV') & (
         light['wattage'] == 400), 'To 250 W LED', light['lamp_type'])
     light['lamp_type'] = np.where((light['lamp_type'] == 'MV') & (
-        light['wattage'] == 125), 'To 20 W LED', light['lamp_type'])
+        light['wattage'] == 125), 'To 18 W LED', light['lamp_type'])
     light['lamp_type'] = np.where((light['lamp_type'] == 'MV') & (
-        light['wattage'] == 150), 'To 20 W LED', light['lamp_type'])
+        light['wattage'] == 150), 'To 18 W LED', light['lamp_type'])
 
     fig = px.scatter_mapbox(light,
                             lat='latitude',
@@ -66,7 +66,7 @@ def plot_lighting_map(light_og):
         showlegend=False
     ))
 
-    poi_large = light[light['lamp_type'] == 'To 20 W LED']
+    poi_large = light[light['lamp_type'] == 'To 18 W LED']
     fig.add_trace(go.Scattermapbox(
         lat=poi_large.latitude,
         lon=poi_large.longitude,
