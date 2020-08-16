@@ -1,4 +1,5 @@
 import os
+from PIL import Image
 
 import streamlit as st
 import pandas as pd
@@ -17,17 +18,10 @@ def update_style():
     padding_left = 10
     padding_bottom = 10
     max_width_str = f"max-width: 100%;"
-    
+
     st.markdown(
         f"""
         <style>
-            .reportview-container .main .block-container{{
-                {max_width_str}
-                padding-top: {padding_top}rem;
-                padding-right: {padding_right}rem;
-                padding-left: {padding_left}rem;
-                padding-bottom: {padding_bottom}rem;
-            }}
             .reportview-container .main {{
                 color: {COLOR};
                 background-color: {BACKGROUND_COLOR};
@@ -49,121 +43,196 @@ def update_style():
         unsafe_allow_html=True,
     )
 
+
+def df_float_formatter(df, formatter="{:.2f}"):
+    """Select float columns and format them with formatter."""
+    float_col = df.select_dtypes(include='float64').columns
+    format_dict = {col: formatter for col in float_col}
+    df = df.style.format(format_dict)
+    return df
+
+
 def main():
     st.beta_set_page_config(page_title='Lights Out!',
-                            page_icon="💡")
+                            page_icon="💡",
+                            initial_sidebar_state='collapsed')
     update_style()
 
-    st.sidebar.header('About Us')
-    st.sidebar.markdown('We are Lights Out!')
     st.markdown("""<h1 style="text-align:center">Lights Out!</h1>""",
                 unsafe_allow_html=True)
+
+    st.markdown(
+        """
+        <p style="text-align:justify">Street lighting comprises of 14.8% (9,935 GJ)
+         of total energy used by the City of Hobart, and is a major contributor 
+         to electrical and greenhouse gas usage in all cities. The City of Hobart 
+         spends approximately $1.5 - $2 million dollars a year and would like to 
+         investigate strategies to reduce their energy costs and light pollution.</p>
+        <p style="text-align:justify">There are over 5,000 street lights in the City 
+        of Hobart, where only 300 are managed by the city. The rest of the lights are 
+        managed by TasNetworks and are unmetered. This means regardless if the light 
+        is on, off, or dimmed, the council pays the full 10 hours a day.</p>
+        <p style="text-align:justify">We wanted to investigate 3 main ideas:</p>
+        <li>Which bulbs are the most effective, and is it cost-effective to swap bulbs?</li>
+        <li>Is it worth metering individual poles to reduce electricity costs from 
+        dimming with and without sensors?</li>
+        <li>Are solar poles worth the cost?</li>
+        <p style="text-align:justify">To investigate this, we looked into street 
+        light data set from the City of Hobart, as well as data on historical energy 
+        usage and foot traffic in the CBD.</p>
+
+        """, unsafe_allow_html=True)
 
     LIGHT_FILE = 'light.csv'
     light = pd.read_csv(LIGHT_FILE)
 
-    st.header('Operational Costs')
+    st.markdown("""<h2 style="text-align:center">Idea 1: Phasing out old MV lamps</h2>""",
+                unsafe_allow_html=True)
     st.write("""
-    * To calculate the operational cost, we first standardise each type of light 
-    to 1700 lumens (a suitable light level for residential lighting)
-    * We calculate the operational cost over a 25,000 hour life span, which 
-    includes electrical cost at $0.4/kwh and the cost of each light. This 
-    standardises all the lights based on life span as well
-    * We can see that LED and HPS lights are the best performers with 
-    approximately half the cost of MV and CFL lights""")
+    <p style="text-align:justify">We wanted to evaluate each type of bulb for their 
+    operational cost over 25,000 hours by standardising their wattage to 1700 lumens. 
+    Assuming an electrical cost of $0.4/kwh, we can see the LED and HPS bulbs are 
+    twice as efficient as MV and CFL bulbs. MV and CFL bulbs are the prime candida
+    tes for replacement given their wattage to lumens inefficiency.</p>
+    <p style="text-align:justify">Assuming the fixed cost of changing a bulb to a 
+    different type is $700 and that we hope to recoup our expenses in 5 years, we 
+    would need a wattage difference of 96watts to justify swapping to a more 
+    efficient LED bulb.</p>
+    """, unsafe_allow_html=True)
     st.plotly_chart(plot_cost(), use_container_width=True)
 
     st.header('Lighting Map')
     st.write(
         """ 
-    * Each type of light is plotted onto a map of Hobart
-        * We can see two major trends:
-        * HPS and MV lights are used for lighting up major roads
-    * Where as LED AND CFL lights are mainly for minor roads and 
-    residential areas
-    * Possible MV replacements have been marked as POI (points of interest)
-        * POI (20W LED) means potential to replace with 20W LED (Square)
-        * POI (250W LED) means potential to replace with 250W LED (Circle)""")
+    <p style="text-align:justify">We visualised each street light in Hobart to 
+    identify trends. We noticed that high wattage HPS and WV lights were used 
+    on highways and major roads, with LED and CFL mainly used on minor roads 
+    in residential areas.</p>
+    <p style="text-align:justify">We recommend swapping out 400W MV to 250W 
+    LED bulbs on major roads.</p>
+    <p style="text-align:justify">We recommend swapping out 125W and 150W MV 
+    to 18W LED bulbs on minor roads.</p>
+    <p style="text-align:justify">Possible MV to LED swap outs have been 
+    located in the map below.</p>
+    """, unsafe_allow_html=True)
     st.plotly_chart(plot_lighting_map(light), use_container_width=True)
 
-    st.header('Light Replacement')
-    st.write(
-        """
-    * Assuming the fixed cost of changing to a different type of light is \$700 
-    * Assuming we hope to recover our light replacement cost in 5 years
-    * We would need approximately an energy saving of $140/yr
-    * Assuming each kwh is $0.40 saved, we would need save 350kwh/yr
-    * This equates to a wattage difference of 96 to justify swapping out a less 
-    efficient light for a LED light
-    """
-    )
-
-    st.header('Metering installation & Sensors')
-    st.write(
-        """
-    * Assume we want to implement some sort of dimming strategy. The council 
-    will only gain monetary benefit if there is metering installed
-    * Assuming the fixed cost of installing metering is \$500 to include the 
-    cost of parts, electrician and a cherry picker 
-    * Assuming we hope to recover our light replacement cost in 5 years
-    * We would need approximately an energy saving of $100/yr
-    * Dimming can only be applied to LED lights
-    * In the context of 18W LED lights and a dimming profile would save 3hrs 
-    per night, we save approximately \$8 per light/yr.
-    * Installing metering for each light pole cannot be justified.
-    * Similarly for the idea of installing sensors.
-    * Reducing wattage is by far the most effective and recommended strategy""")
-    st.markdown('Choose a lamp type below:')
+    st.markdown(
+        'Below you can select which lamp type to view its distribution in Hobart:')
     lamp_type = st.selectbox('', [
                              'MV', 'CFL', 'LED', 'HPS'])
     lamp_type_desc_dict = {
         'MV': """
-        * By plotting the distribution of MV lights, we can see that MV lights 
-        can be clustered into two categories:
-        * less than or equal to 150, and
-            * more than 150 for major road lighting
-            * For the first case we could replace 125 and 150W bulbs with 18W 
-            LED lights in residential areas.
-        * For the second case we could replace 400W bulbs with 250W LED light 
-        on major roads. This is assuming that 250W LED 
-        lights have the equivalent luminosity to 250W HPS lights. This has the 
-        potential saving of $219 in electrical 
-        costs per annum, and there are 155 possible replacements""",
+        <p style="text-align:justify">MV bulbs are the least efficient 
+        and we recommend swapping them when applicable.</p>
+        <p style="text-align:justify">We recommend swapping 400W MV to 
+        250W LED bulbs on major roads. This is assuming that 250W LED 
+        lights have the equivalent luminosity to 250W HPS lights. This 
+        has the potential saving of $219 in electrical costs per annum, 
+        and there are 155 possible replacements.</p>
+        <p style="text-align:justify">We recommend swapping out 125W and 
+        150W MV to 18W LED bulbs on minor roads.</p>
+
+        """,
 
         'CFL': """
-        * Due to the low wattage, there doesn't seem to be any benefit of 
-        monetary benefit of swapping to LED light.""",
+        <p style="text-align:justify">Due to the low wattage of CFL bulbs, 
+        there are no gains from swapping them out into LEDs.</p>
+        """,
 
         'LED': """
-        * Most of the LED lights are in residential areas
-        * LED lights provide the benefit of dimming, so they have the greatest 
-        benefit in residential areas
-        * They have similar luminosity to HPS lights, so there is no justifiable 
-        reason to replace HPS lights with LED lights
-        * We assume no dimming is used on major roads for safety
-        * LED lights do have the benefit of integrating into a smart network and 
-        is the recommended path towards a smart city""",
+        <p style="text-align:justify">LED lights are our lights of choice 
+        due to efficiency, life-span and ability to be dimmed. They are 
+        the most used lights in smart cities and is the recommended light 
+        for future-proofing. The light is directed to the ground with 
+        minimal light pollution. For these reasons we recommend swapping 
+        into LED lamps.</p>
+        """,
 
         'HPS': """
-        * HPS lights have similar luminosity to LED lights, so there is no 
-        justifiable reason to replace them with LED lights
+        <p style="text-align:justify">The efficiency of HPS and LED lamps 
+        are similar, there is no cost-benefit of swapping them to LEDs. 
+        Dimming is not ideal for HPS bulbs as they take time to reach 
+        maximum luminosity and it may reduce their life-span.</p>
         """
     }
-    st.write(lamp_type_desc_dict[lamp_type])
+    st.markdown(lamp_type_desc_dict[lamp_type], unsafe_allow_html=True)
     st.plotly_chart(plot_lamp_hist(light, lamp_type), use_container_width=True)
 
-    st.header('Solar')
-    year_dict = {'Year 1':[1],
-    'Year 2':[2],
-    'Year 3':[3],
-    'Year 4':[4],
-    'All Years':[1,2,3,4],
-    }
+    st.markdown("""<h2 style="text-align:center">Idea 2: Metering, Dimming and Sensors</h2>""",
+                unsafe_allow_html=True)
+
+    st.markdown("""
+    <p style="text-align:justify">For the council to see monetary benefit 
+    from dimming with or without sensors, individual metering would need 
+    to be installed on each light pole. We have focused our attention on 
+    dimming in residential areas, as they are most likely the areas with 
+    the most downtime at night. We have chosen not to consider dimming on 
+    highways and major roads due to safety reasons.</p>
+    <p style="text-align:justify">Dimming already efficient 18W LED lights in 
+    residential areas have minuscule gains of 3 hours saved per night. This is 
+    an annual saving of $8 per meter installed per year. Given an expensive 
+    upfront meter box installation cost, we cannot recommend dimming with or 
+    without sensors on a purely financial level. However, dimming can reduce 
+    greenhouse gas emissions, improve lightbulb lifespan and reduce light pollution.</p>
+
+    """, unsafe_allow_html=True)
+
+    st.markdown("""<h2 style="text-align:center">Idea 3: Adapting to solar</h2>""",
+                unsafe_allow_html=True)
+
+    st.markdown("""
+    <p style="text-align:justify">Solar poles are powered by sun, a renewable
+     energy source.</p>
+    <p style="text-align:justify">We wanted to investigate and weigh up the 
+    benefits and costs of installing solar poles as a permanent electrical 
+    solution.</p>
+    <p style="text-align:justify">Advantages:</p>
+    <li>Solar poles take street lights off the grid permanently, which means 
+    permanent electricity savings from usage per kilowatt hour as well as 
+    network charges</li>
+    <li>The lights are invulnerable to electricity outages, which provides 
+    added safety to the city</li>
+    <li>Solar poles have an average lifespan of 20 years and have low maintenance 
+    costs associated with it</li>
+    <li>Some solar poles also have a sensor option available, which can reduce 
+    light pollution in areas that are deserted at night</li>
+    <p style="text-align:justify">Disadvantages:</p>
+    <li>High upfront cost</li>
+    <li>Solar energy is dependant on weather factors such as UV index, cloud 
+    coverage and daylight hours</li>
+    
+        """, unsafe_allow_html=True)
+
+
+
+    traffic = Image.open(os.path.join('asset', 'traffic.png'))
+    st.image(traffic,
+             use_column_width=True)
+
+    year_dict = {'Year 1': [1],
+                 'Year 2': [2],
+                 'Year 3': [3],
+                 'Year 4': [4],
+                 'All Years': [1, 2, 3, 4],
+                 }
     st.markdown('Choose a year:')
     year_select = st.selectbox('', list(year_dict.keys()))
     solar_df = pd.read_csv('./solar_pole_table.csv')
-    st.plotly_chart(plot_solar(solar_df,year_select), use_container_width=True)
-    solar_df.drop(['Longitude','Latitude'],axis=1)[solar_df['Implementation year'].isin(year_dict[year_select])]
+    st.plotly_chart(plot_solar(solar_df, year_select),
+                    use_container_width=True)
+    solar_df = solar_df.drop(['Longitude', 'Latitude'], axis=1)[
+        solar_df['Implementation year'].isin(year_dict[year_select])]
+    solar_df = df_float_formatter(solar_df, formatter="{:.2f}")
+    solar_df
+
+    st.markdown("""<h2 style="text-align:center">Idea 4: Embracing a smart future</h2>""",
+                unsafe_allow_html=True)
+
+    smart_city = Image.open(os.path.join('asset', 'smart_city.png'))
+    st.image(smart_city, caption='How poles can be intergrated into Smart City',
+             use_column_width=True)
+
 
 if __name__ == '__main__':
     main()
