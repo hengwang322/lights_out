@@ -48,7 +48,7 @@ def df_float_formatter(df, formatter="{:.2f}"):
 
 
 def main():
-    st.beta_set_page_config(page_title='Lights Out!',
+    st.set_page_config(page_title='Lights Out!',
                             page_icon="💡",
                             initial_sidebar_state='collapsed')
     update_style()
